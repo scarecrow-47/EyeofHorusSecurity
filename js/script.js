@@ -1,19 +1,4 @@
-const navToggle = document.getElementById("nav-toggle")
-const navMenu = document.getElementById("nav-menu")
-
-if (navToggle && navMenu) {
-  navToggle.addEventListener("click", () => {
-    navMenu.classList.toggle("active")
-    navToggle.classList.toggle("active")
-  })
-
-  document.querySelectorAll(".nav-link").forEach((link) => {
-    link.addEventListener("click", () => {
-      navMenu.classList.remove("active")
-      navToggle.classList.remove("active")
-    })
-  })
-}
+// ... existing code for phishing templates ...
 
 const phishingTemplates = {
   "google-login": {
@@ -318,6 +303,158 @@ const phishingTemplates = {
   },
 }
 
+let currentLanguage = localStorage.getItem("language") || "ar"
+let currentTheme = localStorage.getItem("theme") || "light"
+
+// Initialize theme on load
+document.addEventListener("DOMContentLoaded", () => {
+  initializeTheme()
+  initializeLanguage()
+  setupThemeToggle()
+  setupLanguageToggle()
+})
+
+function initializeTheme() {
+  if (currentTheme === "dark") {
+    document.body.classList.add("dark-mode")
+    document.getElementById("themeToggle")?.setAttribute("checked", "checked")
+    document.getElementById("themeToggleMobile")?.setAttribute("checked", "checked")
+  }
+}
+
+function initializeLanguage() {
+  if (currentLanguage === "en") {
+    switchToEnglish()
+  }
+}
+
+function setupThemeToggle() {
+  const themeToggle = document.getElementById("themeToggle")
+  const themeToggleMobile = document.getElementById("themeToggleMobile")
+
+  themeToggle?.addEventListener("change", () => {
+    toggleTheme()
+  })
+
+  themeToggleMobile?.addEventListener("change", () => {
+    toggleTheme()
+  })
+}
+
+function setupLanguageToggle() {
+  const langButtons = document.querySelectorAll(".lang-btn")
+
+  langButtons.forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      e.preventDefault()
+      const lang = btn.getAttribute("data-lang")
+      if (lang === "en") {
+        switchToEnglish()
+      } else {
+        switchToArabic()
+      }
+    })
+  })
+}
+
+function toggleTheme() {
+  currentTheme = currentTheme === "light" ? "dark" : "light"
+  localStorage.setItem("theme", currentTheme)
+
+  if (currentTheme === "dark") {
+    document.body.classList.add("dark-mode")
+  } else {
+    document.body.classList.remove("dark-mode")
+  }
+
+  // Sync both toggles
+  const themeToggle = document.getElementById("themeToggle")
+  const themeToggleMobile = document.getElementById("themeToggleMobile")
+  if (themeToggle) {
+    themeToggle.checked = currentTheme === "dark"
+  }
+  if (themeToggleMobile) {
+    themeToggleMobile.checked = currentTheme === "dark"
+  }
+}
+
+function switchToEnglish() {
+  currentLanguage = "en"
+  localStorage.setItem("language", "en")
+  document.documentElement.setAttribute("lang", "en")
+  document.documentElement.setAttribute("dir", "ltr")
+  updatePageContent("en")
+  updateLanguageButtons("en")
+}
+
+function switchToArabic() {
+  currentLanguage = "ar"
+  localStorage.setItem("language", "ar")
+  document.documentElement.setAttribute("lang", "ar")
+  document.documentElement.setAttribute("dir", "rtl")
+  updatePageContent("ar")
+  updateLanguageButtons("ar")
+}
+
+function updatePageContent(lang) {
+  const elements = document.querySelectorAll("[data-ar][data-en]")
+
+  elements.forEach((el) => {
+    if (lang === "en") {
+      el.textContent = el.getAttribute("data-en")
+    } else {
+      el.textContent = el.getAttribute("data-ar")
+    }
+  })
+
+  // Special handling for html/body attributes
+  if (lang === "en") {
+    document.body.style.direction = "ltr"
+  } else {
+    document.body.style.direction = "rtl"
+  }
+}
+
+function updateLanguageButtons(lang) {
+  const buttons = document.querySelectorAll(".lang-btn")
+  buttons.forEach((btn) => {
+    btn.classList.remove("active")
+    if (btn.getAttribute("data-lang") === lang) {
+      btn.classList.add("active")
+    }
+  })
+}
+
+const toggle = document.getElementById("nav-toggle");
+const menu = document.getElementById("nav-menu");
+
+toggle.addEventListener("click", () => {
+  toggle.classList.toggle("active");
+  menu.classList.toggle("active");
+});
+document.addEventListener("DOMContentLoaded", () => {
+  const toggle = document.getElementById("nav-toggle");
+  const menu = document.getElementById("nav-menu");
+
+  toggle.addEventListener("click", (e) => {
+    e.stopPropagation();
+    toggle.classList.toggle("active");
+    menu.classList.toggle("active");
+  });
+
+  // Close the mobile menu when clicking outside it
+  document.addEventListener("click", (e) => {
+    if (
+      menu.classList.contains("active") &&
+      !menu.contains(e.target) &&
+      !toggle.contains(e.target)
+    ) {
+      menu.classList.remove("active");
+      toggle.classList.remove("active");
+    }
+  });
+});
+
 let currentQuizQuestions = []
 let currentIndex = 0
 let score = 0
@@ -334,7 +471,6 @@ const qIndexText = document.getElementById("qIndex")
 const scoreBadge = document.getElementById("scoreBadge")
 const scoreShort = document.getElementById("scoreShort")
 const qCount = document.getElementById("qCount")
-
 const screenshot = document.getElementById("screenshot")
 const siteTitle = document.getElementById("siteTitle")
 const scenarioText = document.getElementById("scenario")
@@ -355,6 +491,23 @@ const finalCard = document.getElementById("final-card")
 const finalScore = document.getElementById("finalScore")
 const finalText = document.getElementById("finalText")
 
+const navToggle = document.getElementById("nav-toggle")
+const navMenu = document.getElementById("nav-menu")
+
+if (navToggle && navMenu) {
+  navToggle.addEventListener("click", () => {
+    navMenu.classList.toggle("active")
+    navToggle.classList.toggle("active")
+  })
+
+  document.querySelectorAll(".nav-link, .dropdown-item").forEach((link) => {
+    link.addEventListener("click", () => {
+      navMenu.classList.remove("active")
+      navToggle.classList.remove("active")
+    })
+  })
+}
+
 function selectRandomQuestions() {
   const templateKeys = Object.keys(phishingTemplates)
   const shuffled = templateKeys.sort(() => 0.5 - Math.random())
@@ -369,7 +522,7 @@ function selectRandomQuestions() {
 function updateOverview() {
   if (qCount) qCount.innerText = currentIndex + 1 + " / 20"
   if (scoreShort) scoreShort.innerText = score
-  if (scoreBadge) scoreBadge.innerText = "النتيجة: " + score
+  if (scoreBadge) scoreBadge.innerText = (currentLanguage === "en" ? "Score: " : "النتيجة: ") + score
 }
 
 function updateUrlBar(item) {
@@ -397,7 +550,7 @@ function showQuestion(index) {
   if (screenshot) {
     screenshot.innerHTML = `
 <iframe 
-src="sites/${item.templateName}/index.html" 
+src="../sites/${item.templateName}/index.html"
 class="quiz-iframe"
 sandbox="allow-scripts allow-same-origin"
 loading="lazy">
@@ -408,7 +561,7 @@ loading="lazy">
   if (siteTitle) siteTitle.innerText = item.title
   if (scenarioText) scenarioText.innerText = item.scenario
   updateUrlBar(item)
-  if (qIndexText) qIndexText.innerText = `السؤال ${index + 1}`
+  if (qIndexText) qIndexText.innerText = currentLanguage === "en" ? `Question ${index + 1}` : `السؤال ${index + 1}`
   if (feedback) feedback.style.display = "none"
   if (noteArea) noteArea.innerHTML = ""
 
@@ -418,13 +571,31 @@ loading="lazy">
   if (btnPrev) btnPrev.disabled = index === 0
   if (btnNext) {
     btnNext.disabled = index === 19
-    // Enable/disable Next button based on whether question is answered
     if (index < 19) {
       btnNext.disabled = !answered[index]
     }
   }
 }
 
+ const headers = document.querySelectorAll(".accordion-header");
+
+  headers.forEach(header => {
+    header.addEventListener("click", () => {
+      const content = header.nextElementSibling;
+
+      headers.forEach(h => {
+        if (h !== header) {
+          h.nextElementSibling.style.maxHeight = null;
+        }
+      });
+
+      if (content.style.maxHeight) {
+        content.style.maxHeight = null;
+      } else {
+        content.style.maxHeight = content.scrollHeight + "px";
+      }
+    });
+  });
 function resetButtonStates() {
   if (btnPhish) {
     btnPhish.disabled = false
@@ -440,20 +611,30 @@ function showFinal() {
   if (qCard) qCard.style.display = "none"
   if (finalCard) finalCard.style.display = "block"
 
-  if (finalScore) finalScore.innerText = `نتيجتك: ${score} من 20`
+  const scoreText = currentLanguage === "en" ? `Your Score: ${score} out of 20` : `نتيجتك: ${score} من 20`
+  if (finalScore) finalScore.innerText = scoreText
 
   const percent = Math.round((score / 20) * 100)
   let message = ""
   let alertClass = ""
 
   if (percent >= 80) {
-    message = "🎉 ممتاز! لديك فهم ممتاز لعلامات التصيّد الإلكتروني. استمر في تطبيق هذه المعرفة."
+    message =
+      currentLanguage === "en"
+        ? "🎉 Excellent! You have a great understanding of phishing signs. Keep applying this knowledge."
+        : "🎉 ممتاز! لديك فهم ممتاز لعلامات التصيّد الإلكتروني. استمر في تطبيق هذه المعرفة."
     alertClass = "alert-success"
   } else if (percent >= 60) {
-    message = "⚠️ جيد! لديك فهم جيد ولكن يمكنك التحسن أكثر. راجع النصائح أدناه."
+    message =
+      currentLanguage === "en"
+        ? "⚠️ Good! You have a good understanding but can improve more. Review the tips below."
+        : "⚠️ جيد! لديك فهم جيد ولكن يمكنك التحسن أكثر. راجع النصائح أدناه."
     alertClass = "alert-warning"
   } else {
-    message = "❌ بحاجة لتحسين! راجع إشارات التحذير بعناية وأعد المحاولة."
+    message =
+      currentLanguage === "en"
+        ? "❌ Needs Improvement! Review warning signs carefully and try again."
+        : "❌ بحاجة لتحسين! راجع إشارات التحذير بعناية وأعد المحاولة."
     alertClass = "alert-danger"
   }
 
@@ -468,7 +649,14 @@ function giveFeedback(isCorrect, explanation) {
     feedback.style.display = "block"
     const alertClass = isCorrect ? "alert-success" : "alert-danger"
     const icon = isCorrect ? "✅" : "❌"
-    const title = isCorrect ? "إجابة صحيحة!" : "إجابة خاطئة!"
+    const title =
+      currentLanguage === "en"
+        ? isCorrect
+          ? "Correct Answer!"
+          : "Wrong Answer!"
+        : isCorrect
+          ? "إجابة صحيحة!"
+          : "إجابة خاطئة!"
 
     feedback.innerHTML = `
 <div class="alert ${alertClass}">
@@ -483,9 +671,10 @@ function giveFeedback(isCorrect, explanation) {
 
   if (noteArea) {
     const alertClass = isCorrect ? "alert-success" : "alert-danger"
+    const label = currentLanguage === "en" ? (isCorrect ? "Correct" : "Wrong") : isCorrect ? "صحيح" : "خطأ"
     noteArea.innerHTML = `
 <div class="alert ${alertClass} small">
-<strong>${isCorrect ? "صحيح" : "خطأ"}:</strong> ${explanation}
+<strong>${label}:</strong> ${explanation}
 </div>
 `
   }
@@ -519,14 +708,12 @@ function answer(selectedPhishing) {
   giveFeedback(correct, item.explanation)
   updateOverview()
 
-  // Check if this is the last question and automatically show results
   if (currentIndex === 19) {
     setTimeout(() => {
       showFinal()
     }, 3000)
   }
 
-  // Enable Next button after answering
   if (btnNext && currentIndex < 19) {
     btnNext.disabled = false
   }
@@ -558,7 +745,7 @@ if (btnLegit) btnLegit.addEventListener("click", () => answer(false))
 if (btnExplain) {
   btnExplain.addEventListener("click", () => {
     const item = currentQuizQuestions[currentIndex]
-    alert("شرح:\n\n" + item.explanation)
+    alert(currentLanguage === "en" ? "Explanation:\n\n" + item.explanation : "شرح:\n\n" + item.explanation)
   })
 }
 
@@ -570,9 +757,12 @@ if (btnPrev) {
 
 if (btnNext) {
   btnNext.addEventListener("click", () => {
-    // Check if current question has been answered before allowing to proceed
     if (!answered[currentIndex]) {
-      alert("يجب الإجابة على السؤال أولاً أو اضغط 'تخطي' للانتقال للسؤال التالي")
+      const msg =
+        currentLanguage === "en"
+          ? "You must answer the question first or press 'Skip' to move to the next question"
+          : "يجب الإجابة على السؤال أولاً أو اضغط 'تخطي' للانتقال للسؤال التالي"
+      alert(msg)
       return
     }
 
@@ -663,3 +853,109 @@ document.addEventListener("keydown", (e) => {
     }
   }
 })
+
+document.addEventListener("DOMContentLoaded", () => {
+  const cards = Array.from(document.querySelectorAll(".tips-grid .tip-card"))
+  if (!cards.length) return
+  cards.forEach((card, i) => {
+    card.classList.remove("in-from-right", "in-from-left", "fade-in", "offset-right", "offset-left", "offset-scale")
+    card.classList.add("offset-bottom")
+    card.classList.add(`stagger-${i % 6}`)
+  })
+  const observerOptions = {
+    root: null,
+    rootMargin: "0px 0px -10% 0px",
+    threshold: 0.15,
+  }
+  const io = new IntersectionObserver((entries, obs) => {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting) return
+      const card = entry.target
+      card.classList.remove("fade-in")
+      void card.offsetWidth
+      card.classList.add("fade-in")
+      obs.unobserve(card)
+    })
+  }, observerOptions)
+  cards.forEach((c) => io.observe(c))
+})
+
+
+// نختار كل العناصر اللي عليها كلاس scroll-element
+const scrollElements = document.querySelectorAll(".scroll-element");
+
+// دالة تتحقق إذا العنصر ظهر على الشاشة
+const elementInView = (el, offset = 0) => {
+    const elementTop = el.getBoundingClientRect().top;
+    return elementTop <= (window.innerHeight || document.documentElement.clientHeight) - offset;
+};
+
+// دالة تضيف الكلاس show
+const displayScrollElement = (el) => {
+    el.classList.add("show");
+};
+
+// دالة تزيل الكلاس show (اختياري لو عايز تقدر تعمل scroll up)
+const hideScrollElement = (el) => {
+    el.classList.remove("show");
+};
+
+// الدالة الرئيسية اللي هتشتغل عند كل Scroll
+const handleScrollAnimation = () => {
+    scrollElements.forEach((el) => {
+        if (elementInView(el, 100)) { // يظهر قبل ما يوصل نص العنصر بمقدار 100px
+            displayScrollElement(el);
+        } else {
+            hideScrollElement(el);
+        }
+    });
+};
+
+
+
+
+// نضيف Event Listener للـ Scroll
+window.addEventListener("scroll", handleScrollAnimation);
+
+// اختياري: نفّذ أول مرة عشان العناصر اللي ظاهر أول الصفحة تظهر مباشرة
+handleScrollAnimation();
+
+
+// Counter Animation
+const counters = document.querySelectorAll('.stat-number');
+let started = false;
+function animateCounter(el) {
+    const originalText = el.textContent.trim();
+
+    // Extract number only
+    const target = parseInt(originalText.replace(/\D/g, ''), 10);
+
+    // Extract prefix & suffix (like "+", "%", "minutes")
+    const prefix = originalText.match(/^\D+/)?.[0] || "";
+    const suffix = originalText.match(/\D+$/)?.[0] || "";
+
+    let current = 0;
+    const speed = target / 60;
+
+    const update = () => {
+        current += speed;
+
+        if (current < target) {
+            el.textContent = prefix + Math.floor(current).toLocaleString() + suffix;
+            requestAnimationFrame(update);
+        } else {
+            el.textContent = prefix + target.toLocaleString() + suffix;
+        }
+    };
+
+    el.style.opacity = 1;
+    update();
+}
+const observer = new IntersectionObserver((entries) => {
+    if (entries[0].isIntersecting && !started) {
+        counters.forEach(c => animateCounter(c));
+        started = true;
+    }
+});
+const statsSection = document.querySelector('.hero-stats');
+observer.observe(statsSection);
